@@ -88,6 +88,7 @@ export const Responsive: Story = {
     viewport: { viewports: INITIAL_VIEWPORTS, defaultViewport: 'iphone6' },
   },
   args: {
+    selectionMode: 'single',
     columns: [
       { header: { key: 'number' } },
       { header: { key: 'payingDate' } },
