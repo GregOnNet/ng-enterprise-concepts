@@ -1,12 +1,14 @@
 // YourComponent.stories.ts
 
 import type { Meta, StoryObj } from '@storybook/angular';
+import { applicationConfig } from '@storybook/angular';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 
 import { DataTable } from './data-table.component';
 import { Component, Input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { component } from './component';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 interface Invoice {
   id: string;
@@ -21,11 +23,12 @@ interface Invoice {
 //👇 This default export determines where your story goes in the story list
 const meta: Meta<DataTable<Invoice>> = {
   component: DataTable,
+  decorators: [applicationConfig({ providers: [provideAnimations()] })],
   args: {
     dataSource: {
       state: 'complete',
       totalModelsCount: 2,
-      trackBy: (model) => model.id,
+      trackBy: (_index, model) => model.id,
       models: [
         {
           id: crypto.randomUUID(),
@@ -111,5 +114,31 @@ export const MultiSelection: Story = {
   args: {
     selectionMode: 'multiple',
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
+  },
+};
+
+function mockInvoice(index: number): Invoice {
+  return {
+    id: crypto.randomUUID(),
+    number: `#2023-08-02-${index + 1}`,
+    payingDate: '2023-08-30',
+    recipient: 'Alan Turing',
+    createdAt: '2023-08-30 10:15',
+    createdBy: 'finance@company.com',
+    reviewedBy: 'finance-review@company.com',
+  };
+}
+
+export const Pagination: Story = {
+  args: {
+    columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
+    dataSource: {
+      state: 'complete',
+      totalModelsCount: 100,
+      trackBy: (_index, model) => model.id,
+      models: Array(20)
+        .fill(null)
+        .map((_, index) => mockInvoice(index)),
+    },
   },
 };

@@ -1,4 +1,5 @@
 import { LoadingState } from './index';
+import { TrackByFunction } from '@angular/core';
 
 export interface DataTableSource<TModel> {
   models: TModel[];
@@ -12,7 +13,7 @@ export interface DataTableSource<TModel> {
    * Tells rendering engine how to identify a
    * model for performance optimizations
    */
-  trackBy: (model: TModel) => string | number;
+  trackBy: TrackByFunction<TModel>;
 
   /*
    * Tells whether a row can be selected or not
