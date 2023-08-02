@@ -105,3 +105,10 @@ export const SingleSelection: Story = {
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
   },
 };
+
+export const MultiSelection: Story = {
+  args: {
+    selectionMode: 'multiple',
+    columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
+  },
+};
