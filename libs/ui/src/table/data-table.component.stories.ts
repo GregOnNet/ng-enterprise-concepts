@@ -56,7 +56,6 @@ type Story = StoryObj<DataTable<Invoice>>;
 
 export const PlainValues: Story = {
   args: {
-    //👇 The args you need here will depend on your component
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
   },
 };
@@ -72,7 +71,6 @@ export class DateCellComponent {
 
 export const CellComponents: Story = {
   args: {
-    //👇 The args you need here will depend on your component
     columns: [
       { header: { key: 'number' } },
       {
@@ -90,7 +88,6 @@ export const Responsive: Story = {
     viewport: { viewports: INITIAL_VIEWPORTS, defaultViewport: 'iphone6' },
   },
   args: {
-    //👇 The args you need here will depend on your component
     columns: [
       { header: { key: 'number' } },
       { header: { key: 'payingDate' } },
@@ -99,5 +96,12 @@ export const Responsive: Story = {
       { header: { key: 'createdBy' } },
       { header: { key: 'reviewedBy' } },
     ],
+  },
+};
+
+export const SingleSelection: Story = {
+  args: {
+    selectionMode: 'single',
+    columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
   },
 };

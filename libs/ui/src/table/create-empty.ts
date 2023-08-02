@@ -1,8 +1,6 @@
 import { DataTableSource } from './types';
 
-export function createInitialDataTableSource<
-  TModel
->(): DataTableSource<TModel> {
+export function createEmpty<TModel>(): DataTableSource<TModel> {
   return {
     state: 'initial',
     models: [],

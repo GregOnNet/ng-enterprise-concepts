@@ -5,4 +5,5 @@ export * from './data-table-column-header';
 export * from './data-table-source';
 export * from './loading-state';
 export * from './page-changed-arguments';
+export * from './selection-mode';
 export * from './sorting-changed-arguments';
