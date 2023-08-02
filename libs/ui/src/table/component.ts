@@ -1,7 +1,7 @@
 import { Type } from '@angular/core';
-import { ComponentInputs } from './types/component-inputs';
+import { ComponentInputs } from './types';
 
-function component<TComponent, TComponentInputSource>(
+export function component<TComponent, TComponentInputSource>(
   type: Type<TComponent>,
   inputs: (source: TComponentInputSource) => ComponentInputs<TComponent>
 ) {
