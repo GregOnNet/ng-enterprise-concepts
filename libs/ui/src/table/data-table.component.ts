@@ -27,33 +27,36 @@ import { createInitialDataTableSource } from './create-initial-data-table-source
     NgIf,
     NgComponentOutlet,
   ],
+  styles: ['.scroll { overflow: auto }'],
   template: `
-    <table mat-table [dataSource]="dataSourceSignal().models">
-      <ng-container
-        [matColumnDef]="column.header.key"
-        *ngFor="
-          let column of columnsSignal();
-          trackBy: dataSourceSignal().trackBy
-        "
-      >
-        <th mat-header-cell *matHeaderCellDef>
-          {{ column.header | dataTableColumnTitle }}
-        </th>
+    <div class="scroll">
+      <table mat-table [dataSource]="dataSourceSignal().models">
+        <ng-container
+          [matColumnDef]="column.header.key"
+          *ngFor="
+            let column of columnsSignal();
+            trackBy: dataSourceSignal().trackBy
+          "
+        >
+          <th mat-header-cell *matHeaderCellDef>
+            {{ column.header | dataTableColumnTitle }}
+          </th>
 
-        <td mat-cell *matCellDef="let model">
-          <ng-container
-            *ngIf="column.cellComponent; else plainText"
-            [ngComponentOutlet]="column.cellComponent.type"
-            [ngComponentOutletInputs]="column.cellComponent.inputs(model)"
-          ></ng-container>
+          <td mat-cell *matCellDef="let model">
+            <ng-container
+              *ngIf="column.cellComponent; else plainText"
+              [ngComponentOutlet]="column.cellComponent.type"
+              [ngComponentOutletInputs]="column.cellComponent.inputs(model)"
+            ></ng-container>
 
-          <ng-template #plainText>{{ model[column.header.key] }}</ng-template>
-        </td>
-      </ng-container>
+            <ng-template #plainText>{{ model[column.header.key] }}</ng-template>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+      </table>
+    </div>
   `,
 })
 export class DataTable<TModel> {
