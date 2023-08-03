@@ -15,6 +15,7 @@ import { DataTableColumnTitlePipe } from './data-table-column-title.pipe';
 import {
   DataTableColumn,
   DataTableSource,
+  LoadingState,
   PageChangedArguments,
   SelectionMode,
   SortingChangedArguments,
@@ -22,6 +23,7 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { SkeletonComponent } from '../skeleton/skeleton.component';
 
 export interface IndeterminateCheckboxState {
   checked: boolean;
@@ -32,15 +34,22 @@ export interface IndeterminateCheckboxState {
   selector: 'ui-data-table',
   standalone: true,
   imports: [
-    MatTableModule,
-    NgForOf,
-    DataTableColumnTitlePipe,
     NgIf,
+    NgForOf,
     NgComponentOutlet,
+    MatTableModule,
     MatCheckboxModule,
     MatPaginatorModule,
+    DataTableColumnTitlePipe,
+    SkeletonComponent,
   ],
-  styles: ['.scroll { overflow: auto }'],
+  styles: [
+    `
+      .scroll {
+        overflow: auto;
+      }
+    `,
+  ],
   template: `
     <div class="scroll">
       <table mat-table [dataSource]="dataSourceSignal()" [trackBy]="trackBySignal()">
@@ -64,6 +73,7 @@ export interface IndeterminateCheckboxState {
         </ng-container>
         <!-- /Selection -->
 
+        <!-- Model Columns -->
         <ng-container
             [matColumnDef]="column.header.key"
             *ngFor="let column of columnsSignal();"
@@ -81,11 +91,24 @@ export interface IndeterminateCheckboxState {
             ></ng-container>
 
             <ng-template #plainText>{{ model[column.header.key] }}</ng-template>
+
           </td>
+
+          <ng-container *ngIf="stateSignal() === 'loading'">
+            <td class="skeleton__grid" mat-footer-cell *matFooterCellDef>
+              <ui-skeleton [lineCount]="10"></ui-skeleton>
+            </td>
+          </ng-container>
+
         </ng-container>
+        <!-- /Model Columns -->
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+
+        <ng-container *ngIf="stateSignal() === 'loading'">
+            <tr mat-footer-row *matFooterRowDef="displayedColumns()"></tr>
+        </ng-container>
       </table>
     </div>
 
@@ -112,6 +135,7 @@ export class DataTable<TModel> implements AfterViewInit {
       dataSource.data = value.models;
     });
 
+    this.stateSignal.set(value.state);
     this.trackBySignal.set(value.trackBy);
     this.paginatorSignal.mutate((paginator) => (paginator.length = value.totalModelsCount));
 
@@ -146,6 +170,7 @@ export class DataTable<TModel> implements AfterViewInit {
     new MatTableDataSource()
   );
 
+  protected readonly stateSignal = signal<LoadingState>('loading');
   protected readonly trackBySignal = signal<TrackByFunction<TModel>>((index) => index);
   protected readonly disableSelectionSignal = signal<(model: TModel) => boolean>(() => false);
 

@@ -57,7 +57,7 @@ export default meta;
 
 type Story = StoryObj<DataTable<Invoice>>;
 
-export const PlainValues: Story = {
+export const Simple: Story = {
   args: {
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
   },
@@ -128,6 +128,18 @@ function mockInvoice(index: number): Invoice {
     reviewedBy: 'finance-review@company.com',
   };
 }
+
+export const Loading: Story = {
+  args: {
+    columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
+    dataSource: {
+      state: 'loading',
+      totalModelsCount: 0,
+      trackBy: (_index, model) => model.id,
+      models: [],
+    },
+  },
+};
 
 export const Pagination: Story = {
   args: {
