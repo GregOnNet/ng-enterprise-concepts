@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 
-import { DataTable } from './data-table.component';
+import { DataTable } from './data.table';
 import { Component, Input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { component } from './component';
@@ -116,18 +116,6 @@ export const MultiSelection: Story = {
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
   },
 };
-
-function mockInvoice(index: number): Invoice {
-  return {
-    id: crypto.randomUUID(),
-    number: `#2023-08-02-${index + 1}`,
-    payingDate: '2023-08-30',
-    recipient: 'Alan Turing',
-    createdAt: '2023-08-30 10:15',
-    createdBy: 'finance@company.com',
-    reviewedBy: 'finance-review@company.com',
-  };
-}
 
 export const Loading: Story = {
   args: {

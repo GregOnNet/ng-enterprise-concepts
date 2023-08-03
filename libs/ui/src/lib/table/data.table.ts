@@ -14,7 +14,6 @@ import {
   DataTableColumn,
   DataTableSource,
   LoadingState,
-  PageChangedArguments,
   SelectionMode,
   SortingChangedArguments,
 } from './types';
@@ -41,8 +40,8 @@ export interface IndeterminateCheckboxState {
     DataTableColumnTitlePipe,
     SkeletonComponent,
   ],
-  templateUrl: './data-table.component.html',
-  styleUrls: ['./data-table.component.scss'],
+  templateUrl: './data.table.html',
+  styleUrls: ['./data.table.scss'],
 })
 export class DataTable<TModel> {
   @Input() set columns(value: DataTableColumn<TModel>[]) {
@@ -72,7 +71,6 @@ export class DataTable<TModel> {
     }
   }
 
-  @Output() pageChanged = new EventEmitter<PageChangedArguments>();
   @Output() selectionChanged = new EventEmitter<TModel[]>();
   @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TModel>>();
 
