@@ -1,0 +1,60 @@
+<div class="scroll">
+  <table mat-table [dataSource]="dataSourceSignal()" [trackBy]="trackBySignal()">
+    <!-- Selection -->
+    <ng-container *ngIf="selectionModeSignal() !== 'none'" [matColumnDef]="selectionColumnKey" sticky>
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox
+          *ngIf="selectionModeSignal() === 'multiple'"
+          (change)="toggleSelectAll()"
+          [checked]="selectionIndeterminateCheckboxSignal().checked"
+          [indeterminate]="selectionIndeterminateCheckboxSignal().indeterminate"
+        />
+      </th>
+      <td mat-cell *matCellDef="let model">
+        <mat-checkbox
+          [disabled]="disableSelectionSignal()(model)"
+          (click)="toggleSelection(model)"
+          [checked]="selectionModel?.isSelected(model)"
+        />
+      </td>
+    </ng-container>
+    <!-- /Selection -->
+
+    <!-- Model Columns -->
+    <ng-container
+      [matColumnDef]="column.header.key"
+      *ngFor="let column of columnsSignal();"
+    >
+      <th mat-header-cell *matHeaderCellDef>
+        {{ column.header | dataTableColumnTitle }}
+      </th>
+
+
+      <td mat-cell *matCellDef="let model">
+        <ng-container
+          *ngIf="column.cellComponent; else plainText"
+          [ngComponentOutlet]="column.cellComponent.type"
+          [ngComponentOutletInputs]="column.cellComponent.inputs(model)"
+        ></ng-container>
+
+        <ng-template #plainText>{{ model[column.header.key] }}</ng-template>
+
+      </td>
+
+      <ng-container *ngIf="stateSignal() === 'loading'">
+        <td class="skeleton__grid" mat-footer-cell *matFooterCellDef>
+          <ui-skeleton [lineCount]="10"></ui-skeleton>
+        </td>
+      </ng-container>
+
+    </ng-container>
+    <!-- /Model Columns -->
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+
+    <ng-container *ngIf="stateSignal() === 'loading'">
+      <tr mat-footer-row *matFooterRowDef="displayedColumns()"></tr>
+    </ng-container>
+  </table>
+</div>

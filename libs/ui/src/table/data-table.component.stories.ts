@@ -140,17 +140,3 @@ export const Loading: Story = {
     },
   },
 };
-
-export const Pagination: Story = {
-  args: {
-    columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
-    dataSource: {
-      state: 'complete',
-      totalModelsCount: 100,
-      trackBy: (_index, model) => model.id,
-      models: Array(20)
-        .fill(null)
-        .map((_, index) => mockInvoice(index)),
-    },
-  },
-};

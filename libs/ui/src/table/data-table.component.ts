@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   computed,
   EventEmitter,
@@ -7,7 +6,6 @@ import {
   Output,
   signal,
   TrackByFunction,
-  ViewChild,
 } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { NgComponentOutlet, NgForOf, NgIf } from '@angular/common';
@@ -22,7 +20,7 @@ import {
 } from './types';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { SkeletonComponent } from '../skeleton/skeleton.component';
 
 export interface IndeterminateCheckboxState {
@@ -43,89 +41,10 @@ export interface IndeterminateCheckboxState {
     DataTableColumnTitlePipe,
     SkeletonComponent,
   ],
-  styles: [
-    `
-      .scroll {
-        overflow: auto;
-      }
-    `,
-  ],
-  template: `
-    <div class="scroll">
-      <table mat-table [dataSource]="dataSourceSignal()" [trackBy]="trackBySignal()">
-        <!-- Selection -->
-        <ng-container *ngIf="selectionModeSignal() !== 'none'" [matColumnDef]="selectionColumnKey" sticky>
-          <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox
-                *ngIf="selectionModeSignal() === 'multiple'"
-                (change)="toggleSelectAll()"
-                [checked]="selectionIndeterminateCheckboxSignal().checked"
-                [indeterminate]="selectionIndeterminateCheckboxSignal().indeterminate"
-            />
-          </th>
-          <td mat-cell *matCellDef="let model">
-            <mat-checkbox
-                [disabled]="disableSelectionSignal()(model)"
-                (click)="toggleSelection(model)"
-                [checked]="selectionModel?.isSelected(model)"
-            />
-          </td>
-        </ng-container>
-        <!-- /Selection -->
-
-        <!-- Model Columns -->
-        <ng-container
-            [matColumnDef]="column.header.key"
-            *ngFor="let column of columnsSignal();"
-        >
-          <th mat-header-cell *matHeaderCellDef>
-            {{ column.header | dataTableColumnTitle }}
-          </th>
-
-
-          <td mat-cell *matCellDef="let model">
-            <ng-container
-                *ngIf="column.cellComponent; else plainText"
-                [ngComponentOutlet]="column.cellComponent.type"
-                [ngComponentOutletInputs]="column.cellComponent.inputs(model)"
-            ></ng-container>
-
-            <ng-template #plainText>{{ model[column.header.key] }}</ng-template>
-
-          </td>
-
-          <ng-container *ngIf="stateSignal() === 'loading'">
-            <td class="skeleton__grid" mat-footer-cell *matFooterCellDef>
-              <ui-skeleton [lineCount]="10"></ui-skeleton>
-            </td>
-          </ng-container>
-
-        </ng-container>
-        <!-- /Model Columns -->
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
-
-        <ng-container *ngIf="stateSignal() === 'loading'">
-            <tr mat-footer-row *matFooterRowDef="displayedColumns()"></tr>
-        </ng-container>
-      </table>
-    </div>
-
-    <mat-paginator [pageSizeOptions]="paginatorSignal().pageSizeOptions"
-                   [pageSize]="paginatorSignal().pageSize"
-                   [length]="paginatorSignal().length"
-                   (page)="updatePagination($event)"
-                   showFirstLastButtons
-                   aria-label="Select page of periodic elements">
-    </mat-paginator>
-  `,
+  templateUrl: './data-table.component.html',
+  styleUrls: ['./data-table.component.scss'],
 })
-export class DataTable<TModel> implements AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  ngAfterViewInit(): void {
-    this.dataSourceSignal.mutate((dataSource) => (dataSource.paginator = this.paginator));
-  }
+export class DataTable<TModel> {
   @Input() set columns(value: DataTableColumn<TModel>[]) {
     this.columnsSignal.set(value);
   }
@@ -137,7 +56,6 @@ export class DataTable<TModel> implements AfterViewInit {
 
     this.stateSignal.set(value.state);
     this.trackBySignal.set(value.trackBy);
-    this.paginatorSignal.mutate((paginator) => (paginator.length = value.totalModelsCount));
 
     if (value.disableSelection) this.disableSelectionSignal.set(value.disableSelection);
   }
@@ -157,14 +75,6 @@ export class DataTable<TModel> implements AfterViewInit {
   @Output() pageChanged = new EventEmitter<PageChangedArguments>();
   @Output() selectionChanged = new EventEmitter<TModel[]>();
   @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TModel>>();
-
-  protected readonly paginatorSignal = signal({
-    pageSizeOptions: [10, 20, 50],
-    pageSize: 10,
-    length: 0,
-    offset: 0,
-    limit: 10,
-  });
 
   protected readonly dataSourceSignal = signal<MatTableDataSource<TModel>>(
     new MatTableDataSource()
@@ -232,17 +142,5 @@ export class DataTable<TModel> implements AfterViewInit {
     } else {
       this.selectionIndeterminateCheckboxSignal.set({ checked: false, indeterminate: true });
     }
-  }
-
-  updatePagination($event: PageEvent) {
-    const offset = $event.pageIndex * $event.pageSize;
-    const limit = $event.pageSize;
-
-    this.paginatorSignal.mutate((paginator) => {
-      paginator.offset = offset;
-      paginator.limit = limit;
-    });
-
-    this.pageChanged.emit({ offset, limit });
   }
 }
