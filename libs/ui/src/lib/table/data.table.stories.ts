@@ -117,6 +117,22 @@ export const MultiSelection: Story = {
   },
 };
 
+export const StickyColumn: Story = {
+  parameters: {
+    viewport: { viewports: INITIAL_VIEWPORTS, defaultViewport: 'iphone6' },
+  },
+  args: {
+    selectionMode: 'multiple',
+    columns: [
+      { header: { key: 'number' } },
+      { header: { key: 'payingDate' } },
+      { header: { key: 'createdAt' } },
+      { header: { key: 'createdBy' } },
+      { header: { key: 'recipient' }, stickiness: { stickyEnd: true } },
+    ],
+  },
+};
+
 export const Loading: Story = {
   args: {
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],

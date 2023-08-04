@@ -33,7 +33,11 @@
     <!-- /Selection -->
 
     <!-- Model Columns -->
-    <ng-container [matColumnDef]="column.header.key" *ngFor="let column of columnsSignal();">
+    <ng-container
+      [matColumnDef]="column.header.key"
+      *ngFor="let column of columnsSignal();"
+      [stickyEnd]="$any(column.stickiness?.stickyEnd)"
+    >
       <th mat-header-cell mat-sort-header *matHeaderCellDef>
         {{ column.header | dataTableColumnTitle }}
       </th>

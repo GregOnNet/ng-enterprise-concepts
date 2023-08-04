@@ -6,3 +6,4 @@ export * from './data-table-source';
 export * from './loading-state';
 export * from './selection-mode';
 export * from './sorting-changed-arguments';
+export { DataTableColumnStickiness } from './data-table-column-stickiness';
