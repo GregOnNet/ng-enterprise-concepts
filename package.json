@@ -15,6 +15,7 @@
     "@angular/platform-browser": "16.2.0-next.4",
     "@angular/platform-browser-dynamic": "16.2.0-next.4",
     "@angular/router": "16.2.0-next.4",
+    "@ngneat/query": "1.0.0-beta.19",
     "@nx/angular": "16.6.0",
     "@storybook/addon-viewport": "^7.2.0",
     "react": "^18.2.0",

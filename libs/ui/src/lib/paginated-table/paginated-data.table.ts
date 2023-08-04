@@ -6,7 +6,7 @@ import { NgIf } from '@angular/common';
 import { DataTableColumn, DataTableSource } from '../table/types';
 
 @Component({
-  selector: 'ui-paginated-table',
+  selector: 'ui-paginated-data-table',
   standalone: true,
   imports: [DataTable, MatPaginatorModule, NgIf],
   template: `
@@ -31,7 +31,7 @@ export class PaginatedDataTable<TModel> {
   @Input({ required: true }) set dataSource(value: DataTableSource<TModel>) {
     this.dataSourceSignal.set(value);
 
-    this.paginatorSignal.mutate((paginator) => (paginator.length = value.totalModelsCount));
+    this.paginatorSignal.mutate((paginator) => (paginator.length = value.count));
   }
 
   @Output() pageChanged = new EventEmitter<PageChangedArguments>();
@@ -45,14 +45,14 @@ export class PaginatedDataTable<TModel> {
   });
 
   protected updatePaginator($event: PageEvent) {
-    const currentPage = $event.pageIndex + 1;
-    const pageSize = $event.pageSize + 1;
+    const page = $event.pageIndex;
+    const pageSize = $event.pageSize;
 
     this.paginatorSignal.mutate((paginator) => {
-      paginator.currentPage = currentPage;
+      paginator.currentPage = page;
       paginator.pageSize = pageSize;
     });
 
-    this.pageChanged.emit({ currentPage, pageSize });
+    this.pageChanged.emit({ page, pageSize });
   }
 }

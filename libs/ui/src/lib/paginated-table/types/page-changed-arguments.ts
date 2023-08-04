@@ -1,4 +1,4 @@
 export interface PageChangedArguments {
-  currentPage: number;
+  page: number;
   pageSize: number;
 }

@@ -1,24 +1,24 @@
 import { LoadingState } from './index';
 import { TrackByFunction } from '@angular/core';
 
-export interface DataTableSource<TModel> {
-  models: TModel[];
+export interface DataTableSource<TData> {
+  data: TData[];
 
   /*
    * Represents the count of all models that could be retrieved.
    */
-  totalModelsCount: number;
+  count: number;
 
   /*
    * Tells rendering engine how to identify a
    * model for performance optimizations
    */
-  trackBy: TrackByFunction<TModel>;
+  trackBy: TrackByFunction<TData>;
 
   /*
    * Tells whether a row can be selected or not
    */
-  disableSelection?: (model: TModel) => boolean;
+  disableSelection?: (model: TData) => boolean;
 
   /*
    * Represents the state of the models in the table.

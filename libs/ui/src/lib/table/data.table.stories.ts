@@ -27,9 +27,9 @@ const meta: Meta<DataTable<Invoice>> = {
   args: {
     dataSource: {
       state: 'complete',
-      totalModelsCount: 2,
+      count: 2,
       trackBy: (_index, model) => model.id,
-      models: [
+      data: [
         {
           id: crypto.randomUUID(),
           number: '#2023-08-02-1',
@@ -122,9 +122,9 @@ export const Loading: Story = {
     columns: [{ header: { key: 'number' } }, { header: { key: 'payingDate' } }],
     dataSource: {
       state: 'loading',
-      totalModelsCount: 0,
+      count: 0,
       trackBy: (_index, model) => model.id,
-      models: [],
+      data: [],
     },
   },
 };

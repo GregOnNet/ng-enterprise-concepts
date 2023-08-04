@@ -43,14 +43,14 @@ export interface IndeterminateCheckboxState {
   templateUrl: './data.table.html',
   styleUrls: ['./data.table.scss'],
 })
-export class DataTable<TModel> {
-  @Input() set columns(value: DataTableColumn<TModel>[]) {
+export class DataTable<TData> {
+  @Input() set columns(value: DataTableColumn<TData>[]) {
     this.columnsSignal.set(value);
   }
 
-  @Input() set dataSource(value: DataTableSource<TModel>) {
+  @Input() set dataSource(value: DataTableSource<TData>) {
     this.dataSourceSignal.mutate((dataSource) => {
-      dataSource.data = value.models;
+      dataSource.data = value.data;
     });
 
     this.stateSignal.set(value.state);
@@ -71,20 +71,18 @@ export class DataTable<TModel> {
     }
   }
 
-  @Output() selectionChanged = new EventEmitter<TModel[]>();
-  @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TModel>>();
+  @Output() selectionChanged = new EventEmitter<TData[]>();
+  @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TData>>();
 
-  protected readonly dataSourceSignal = signal<MatTableDataSource<TModel>>(
-    new MatTableDataSource()
-  );
+  protected readonly dataSourceSignal = signal<MatTableDataSource<TData>>(new MatTableDataSource());
 
   protected readonly stateSignal = signal<LoadingState>('loading');
-  protected readonly trackBySignal = signal<TrackByFunction<TModel>>((index) => index);
-  protected readonly disableSelectionSignal = signal<(model: TModel) => boolean>(() => false);
+  protected readonly trackBySignal = signal<TrackByFunction<TData>>((index) => index);
+  protected readonly disableSelectionSignal = signal<(model: TData) => boolean>(() => false);
 
-  protected readonly columnsSignal = signal<DataTableColumn<TModel>[]>([]);
+  protected readonly columnsSignal = signal<DataTableColumn<TData>[]>([]);
 
-  protected selectionModel: SelectionModel<TModel> | null = null;
+  protected selectionModel: SelectionModel<TData> | null = null;
   protected readonly selectionColumnKey = '__selection__';
   protected readonly selectionModeSignal = signal<SelectionMode>('none');
   protected readonly selectionIndeterminateCheckboxSignal = signal<IndeterminateCheckboxState>({
@@ -120,7 +118,7 @@ export class DataTable<TModel> {
     this.setIndeterminateCheckbox();
   }
 
-  protected toggleSelection(model: TModel) {
+  protected toggleSelection(model: TData) {
     if (!this.selectionModel) throw new Error('Expected SelectionModel to be initialized');
 
     this.selectionModel.isSelected(model)
