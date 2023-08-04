@@ -1,5 +1,11 @@
 <div class="scroll">
-  <table mat-table [dataSource]="dataSourceSignal()" [trackBy]="trackBySignal()">
+  <table
+    mat-table
+    matSort
+    [dataSource]="dataSourceSignal()"
+    [trackBy]="trackBySignal()"
+    (matSortChange)="updateSort($event)"
+  >
     <!-- Selection -->
     <ng-container
       *ngIf="selectionModeSignal() !== 'none'"
@@ -28,7 +34,9 @@
 
     <!-- Model Columns -->
     <ng-container [matColumnDef]="column.header.key" *ngFor="let column of columnsSignal();">
-      <th mat-header-cell *matHeaderCellDef>{{ column.header | dataTableColumnTitle }}</th>
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>
+        {{ column.header | dataTableColumnTitle }}
+      </th>
 
       <td mat-cell *matCellDef="let model">
         <ng-container

@@ -6,6 +6,7 @@ import {
   Output,
   signal,
   TrackByFunction,
+  ViewChild,
 } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { NgComponentOutlet, NgForOf, NgIf } from '@angular/common';
@@ -19,8 +20,8 @@ import {
 } from './types';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { SkeletonComponent } from '../skeleton/skeleton.component';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 
 export interface IndeterminateCheckboxState {
   checked: boolean;
@@ -35,8 +36,8 @@ export interface IndeterminateCheckboxState {
     NgForOf,
     NgComponentOutlet,
     MatTableModule,
+    MatSortModule,
     MatCheckboxModule,
-    MatPaginatorModule,
     DataTableColumnTitlePipe,
     SkeletonComponent,
   ],
@@ -73,6 +74,8 @@ export class DataTable<TData> {
 
   @Output() selectionChanged = new EventEmitter<TData[]>();
   @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TData>>();
+
+  @ViewChild(MatSort) sort?: MatSort;
 
   protected readonly dataSourceSignal = signal<MatTableDataSource<TData>>(new MatTableDataSource());
 
@@ -138,5 +141,17 @@ export class DataTable<TData> {
     } else {
       this.selectionIndeterminateCheckboxSignal.set({ checked: false, indeterminate: true });
     }
+  }
+
+  /*
+   * This table does no client-side sorting.
+   * It informs about which column was clicked to allow creating a Query
+   * that is sent to an API delivering sorted data.
+   */
+  updateSort(sortArguments: Sort) {
+    this.sortingChanged.emit({
+      key: sortArguments.active as keyof TData,
+      direction: sortArguments.direction,
+    });
   }
 }

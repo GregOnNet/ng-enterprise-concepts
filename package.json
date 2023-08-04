@@ -18,6 +18,8 @@
     "@ngneat/query": "1.0.0-beta.19",
     "@nx/angular": "16.6.0",
     "@storybook/addon-viewport": "^7.2.0",
+    "@types/lodash": "^4.14.196",
+    "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rxjs": "~7.8.0",

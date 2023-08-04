@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { DataTable } from '@pg/ui';
-import { PageChangedArguments } from './types';
+import { DataTable } from '../table/data.table';
+import { PageChangedArguments, PageState } from './types';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { NgIf } from '@angular/common';
-import { DataTableColumn, DataTableSource } from '../table/types';
+import { DataTableColumn, DataTableSource, SortingChangedArguments } from '../table/types';
 
 @Component({
   selector: 'ui-paginated-data-table',
@@ -14,30 +14,34 @@ import { DataTableColumn, DataTableSource } from '../table/types';
       *ngIf="dataSourceSignal() as dataSource"
       [columns]="columns"
       [dataSource]="dataSource"
+      (selectionChanged)="selectionChanged.emit($event)"
+      (sortingChanged)="updateSorting($event)"
     ></ui-data-table>
 
     <mat-paginator
-      [length]="paginatorSignal().length"
-      [pageSize]="paginatorSignal().pageSize"
-      [pageSizeOptions]="paginatorSignal().pageSizeOptions"
+      [length]="pageSignal().length"
+      [pageSize]="pageSignal().pageSize"
+      [pageSizeOptions]="pageSignal().pageSizeOptions"
       (page)="updatePaginator($event)"
     ></mat-paginator>
   `,
   styles: [],
 })
-export class PaginatedDataTable<TModel> {
-  @Input({ required: true }) columns: DataTableColumn<TModel>[] = [];
+export class PaginatedDataTable<TData> {
+  @Input({ required: true }) columns: DataTableColumn<TData>[] = [];
 
-  @Input({ required: true }) set dataSource(value: DataTableSource<TModel>) {
+  @Input({ required: true }) set dataSource(value: DataTableSource<TData>) {
     this.dataSourceSignal.set(value);
 
-    this.paginatorSignal.mutate((paginator) => (paginator.length = value.count));
+    this.pageSignal.mutate((paginator) => (paginator.length = value.count));
   }
 
-  @Output() pageChanged = new EventEmitter<PageChangedArguments>();
+  @Output() pageChanged = new EventEmitter<PageChangedArguments<TData>>();
+  @Output() selectionChanged = new EventEmitter<TData[]>();
+  @Output() sortingChanged = new EventEmitter<SortingChangedArguments<TData>>();
 
-  protected readonly dataSourceSignal = signal<DataTableSource<TModel> | null>(null);
-  protected readonly paginatorSignal = signal({
+  protected readonly dataSourceSignal = signal<DataTableSource<TData> | null>(null);
+  readonly pageSignal = signal<PageState<TData>>({
     currentPage: 0,
     length: 0,
     pageSize: 10,
@@ -48,11 +52,28 @@ export class PaginatedDataTable<TModel> {
     const page = $event.pageIndex;
     const pageSize = $event.pageSize;
 
-    this.paginatorSignal.mutate((paginator) => {
+    this.pageSignal.mutate((paginator) => {
       paginator.currentPage = page;
       paginator.pageSize = pageSize;
     });
 
     this.pageChanged.emit({ page, pageSize });
+  }
+
+  protected updateSorting(sortingChangedArguments: SortingChangedArguments<TData>) {
+    this.pageSignal.mutate((page) => {
+      page.sorting = {
+        key: sortingChangedArguments.key,
+        direction: sortingChangedArguments.direction,
+      };
+    });
+
+    const page = this.pageSignal();
+
+    this.pageChanged.emit({
+      page: page.currentPage,
+      pageSize: page.pageSize,
+      orderBy: page.sorting,
+    });
   }
 }

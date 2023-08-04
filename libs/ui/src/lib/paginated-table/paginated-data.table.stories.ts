@@ -9,6 +9,7 @@ import { DataTableColumn, DataTableSource } from '../table/types';
 import { PageChangedArguments } from './types';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
+import { orderBy as _orderBy } from 'lodash';
 
 interface Invoice {
   id: string;
@@ -37,7 +38,14 @@ interface PagedData<TModel> {
   data: TModel[];
 }
 
-function readPagedInvoices(page: number, pageSize: number): Observable<PagedData<Invoice>> {
+function readPagedInvoices(
+  page: number,
+  pageSize: number,
+  orderBy?: {
+    key: keyof Invoice;
+    direction: 'asc' | 'desc' | '';
+  }
+): Observable<PagedData<Invoice>> {
   const offset = page * pageSize;
   const limit = pageSize;
 
@@ -46,12 +54,19 @@ function readPagedInvoices(page: number, pageSize: number): Observable<PagedData
     .fill(null)
     .map((_, index) => mockInvoice(index));
 
+  const pagedInvoices = {
+    count: invoicesTotal,
+    data: invoiceDB.slice(offset, offset + limit),
+  };
+
+  if (orderBy && orderBy.direction) {
+    pagedInvoices.data = _orderBy(pagedInvoices.data, [orderBy.key], [orderBy.direction]);
+    console.log(orderBy.direction, pagedInvoices.data);
+  }
+
   return interval(500).pipe(
     first(),
-    map(() => ({
-      count: invoicesTotal,
-      data: invoiceDB.slice(offset, offset + limit),
-    }))
+    map(() => pagedInvoices)
   );
 }
 
@@ -59,10 +74,17 @@ function readPagedInvoices(page: number, pageSize: number): Observable<PagedData
 export class InvoiceClient {
   private readonly useQuery = inject(UseQuery);
 
-  readPaged(page: number, pageSize: number) {
+  readPaged(
+    page: number,
+    pageSize: number,
+    orderBy?: {
+      key: keyof Invoice;
+      direction: 'asc' | 'desc' | '';
+    }
+  ) {
     return this.useQuery({
       queryKey: ['invoices', page.toString()],
-      queryFn: () => readPagedInvoices(page, pageSize),
+      queryFn: () => readPagedInvoices(page, pageSize, orderBy),
     });
   }
 }
@@ -98,9 +120,9 @@ export class PaginatedTableSandboxComponent implements OnInit {
     this.loadFirstPage().subscribe();
   }
 
-  readPage(args: PageChangedArguments) {
+  readPage(args: PageChangedArguments<Invoice>) {
     this.client
-      .readPaged(args.page, args.pageSize)
+      .readPaged(args.page, args.pageSize, args.orderBy)
       .result$.pipe(
         tap((result) => {
           this.dataSourceSignal.update((dataSource) => {
